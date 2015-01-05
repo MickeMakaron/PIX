@@ -1,3 +1,26 @@
+/****************************************************************
+****************************************************************
+*
+* PIX - Multiplayer sandbox game in javascript.
+* Copyright (C) 2014-2015 Mikael Hernvall (mikael.hernvall@gmail.com)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
+****************************************************************
+****************************************************************/
+
+
 /**
  * CONFIGURATION
  * 
@@ -15,9 +38,8 @@ var PLAYER_SIZE = {height: 15, width: 15};
 var DEFAULT_STATE = 'menu';
 
 // The port and host of the server to connect to. Connection to the server is only required for multiplayer.
-// The default values PORT = 8014 and HOST = 'sweet.student.bth.se' will connect you to PIX's server.
-var PORT = 8014;
-var HOST = 'sweet.student.bth.se';
+var PORT = 0;
+var HOST = '';
 
 
 
@@ -2075,7 +2097,7 @@ MenuState.prototype =
 					"PIX is a school project by a student",
 					"at BTH in Sweden. It's entirely free.",
 					"",
-					"No rights reserved.",
+					"Source code is available under GNU v3.0.",
 					"",
 					"PIX is more of a playground than a game.",
 					"You navigate a cube in a limited environment.",
