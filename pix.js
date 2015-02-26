@@ -2094,8 +2094,9 @@ MenuState.prototype =
 				)];
 				this.text = 
 				[
-					"PIX is a school project by a student",
-					"at BTH in Sweden. It's entirely free.",
+					"PIX is a school project by Mikael Hernvall",
+					"a student at Blekinge Institute of Technology",
+					"in Sweden. It's entirely free.",
 					"",
 					"Source code is available under GNU v3.0.",
 					"",
