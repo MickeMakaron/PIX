@@ -872,7 +872,6 @@ World.prototype =
 		var snapChart = new Vector(0, 0);
 		var zerofyVelocity = {x:false, y:false};
 
-		var i;
 		if(this.player.willCrossThreshold.left || this.player.willCrossThreshold.right)
 		{
 			var indices = this.player.willCrossThreshold.left ? this.player.getBorderIndices('left', new Vector(-1, 0)) : this.player.getBorderIndices('right', new Vector(1, 0));
@@ -880,7 +879,7 @@ World.prototype =
 			var result = this.blocksHaveClip(indices, true);
 			
 			var self = this;
-			function setSnap()
+			function setSnapX()
 			{
 				zerofyVelocity.x = true;
 				snapChart.x = self.player.willCrossThreshold.left ? -1 : 1;
@@ -894,7 +893,7 @@ World.prototype =
 				var botIsClipping = (this.blocksHaveClip(this.player.getBorderIndices('bot', new Vector(0, 1)), true) !== false);
 				var topIsClipping = (this.blocksHaveClip(this.player.getBorderIndices('top', new Vector(0, -1)), true) !== false);				
 				
-				function setClimb(direction, stepSize)
+				function setClimbX(direction, stepSize)
 				{
 					var index = self.player.index;
 					self.drawBlockRect(index.left, index.right, index.top, index.bot);
@@ -914,73 +913,76 @@ World.prototype =
 				var first = indices[0];
 				var end = indices[indices.length - 1];
 				
-				function checkIfClimbClips(stepSize, sideIsClipping, index, direction)
+				function checkIfClimbClipsX(stepSize, sideIsClipping, index, direction)
 				{
 					if(!sideIsClipping && self.blocksHaveClip([index]) === false)
-						setClimb(direction, stepSize);
-					else
-						return false;
-				}
-				
-				function checkResult()
-				{
-					if(result.y > end.y - legSize && botIsClipping)
 					{
-						stepSize = end.y - result.y + 1;
-						return checkIfClimbClips(stepSize, topIsClipping, new Vector(first.x, first.y - stepSize), -1);
+						setClimbX(direction, stepSize);
+						return true;
 					}
 					else
 						return false;
 				}
 				
-				function checkReversedResult()
+				function checkResultX()
+				{
+					if(result.y > end.y - legSize && botIsClipping)
+					{
+						console.log("passed 1");
+						stepSize = end.y - result.y + 1;
+						checkIfClimbClipsX(stepSize, topIsClipping, new Vector(first.x, first.y - stepSize), -1);
+					}
+					else
+						setSnapX();
+				}
+				
+				function checkReversedResultX()
 				{
 					var reversedResult = self.blocksHaveClip(JSON.parse(JSON.stringify(indices)).reverse(), true);
 					if(reversedResult.y < first.y + legSize && topIsClipping)
 					{
 						stepSize = reversedResult.y - first.y + 1;
-						return checkIfClimbClips(stepSize, botIsClipping, new Vector(first.x, end.y + stepSize), 1);
+						checkIfClimbClipsX(stepSize, botIsClipping, new Vector(first.x, end.y + stepSize), 1);
+						return true;
 					}
 					else
 						return false;
 				}
 				
-				if(this.player.velocity.y < 0 && !checkResult())
-					setSnap();
-				else if(this.player.velocity.y > 0 && !checkReversedResult())
-					setSnap();
-				else if(!(checkResult() || checkReversedResult()))
-					setSnap();
+				if(this.player.velocity.y < 0 && !checkResultX())
+					setSnapX();
+				else if(this.player.velocity.y > 0 && !checkReversedResultX())
+					setSnapX();
+				else if(!(checkResultX() || checkReversedResultX()))
+					setSnapX();
 			}
 			else 
-			{
-				
-				
+			{				
 				if(this.player.willCrossThreshold.top)
 				{			
 					var indices = this.player.getBorderIndices('top', new Vector(0, -1));
 					var corner = this.player.willCrossThreshold.left ? new Vector(indices[0].x - 1, indices[0].y) : new Vector(indices[indices.length - 1].x + 1, indices[0].y);
 					if(this.blocksHaveClip(indices, true) === false && this.blocksHaveClip([corner]) === true)
-						setSnap();
+						setSnapX();
 				}
 				else if(this.player.willCrossThreshold.bot)
 				{
 					var indices = this.player.getBorderIndices('bot', new Vector(0, 1));
 					var corner = this.player.willCrossThreshold.left ? new Vector(indices[0].x - 1, indices[0].y) : new Vector(indices[indices.length - 1].x + 1, indices[0].y);
 					if(this.blocksHaveClip(indices, true) === false && this.blocksHaveClip([corner]) === true)
-						setSnap()
+						setSnapX();
 				}
 			}
+			
 		}
-		if(this.player.willCrossThreshold.top || this.player.willCrossThreshold.bot)
+		if(this.player.willCrossThreshold.top === true || this.player.willCrossThreshold.bot === true)
 		{
 			var indices = this.player.willCrossThreshold.top ? this.player.getBorderIndices('top', new Vector(0, -1)) : this.player.getBorderIndices('bot', new Vector(0, 1));
 			
 			var result = this.blocksHaveClip(indices, true);
 			
-			
 			var self = this;
-			function setSnap()
+			function setSnapY()
 			{
 				zerofyVelocity.y = true;
 				snapChart.y = self.player.willCrossThreshold.top ? -1 : 1;
@@ -994,8 +996,7 @@ World.prototype =
 				var rightIsClipping = (this.blocksHaveClip(this.player.getBorderIndices('right', new Vector(1, 0)), true) !== false);
 				var leftIsClipping = (this.blocksHaveClip(this.player.getBorderIndices('left', new Vector(-1, 0)), true) !== false);
 
-				var self = this;
-				function setClimb(direction, stepSize)
+				function setClimbY(direction, stepSize)
 				{
 					if(direction < 0)
 					{
@@ -1012,49 +1013,51 @@ World.prototype =
 				var first = indices[0];
 				var end = indices[indices.length - 1];
 
-				function checkIfClimbClips(stepSize, sideIsClipping, index, direction)
+				function checkIfClimbClipsY(stepSize, sideIsClipping, index, direction)
 				{
 					if(!sideIsClipping && self.blocksHaveClip([index]) === false)
 					{
-						setClimb(direction, stepSize);
+						setClimbY(direction, stepSize);
 						return true;
 					}
 					else
 						return false;
 				}
 
-				function checkResult()
+				function checkResultY()
 				{
 					if(result.x > end.x - legSize && rightIsClipping)
 					{
 						stepSize = end.x - result.x + 1;
-						checkIfClimbClips(stepSize, leftIsClipping, new Vector(first.x - stepSize, first.y), -1);
+						checkIfClimbClipsY(stepSize, leftIsClipping, new Vector(first.x - stepSize, first.y), -1);
 					}
 					else
-						setSnap();
+						setSnapY();
 				}
-
-				function checkReversedResult()
+				
+				function checkReversedResultY()
 				{
 					var reversedResult = self.blocksHaveClip(JSON.parse(JSON.stringify(indices)).reverse(), true);
 					if(reversedResult.x < first.x + legSize && leftIsClipping)
 					{
 						stepSize = reversedResult.x - first.x + 1;
-						checkIfClimbClips(stepSize, rightIsClipping, new Vector(first.x + stepSize, end.y), 1);
+						checkIfClimbClipsY(stepSize, rightIsClipping, new Vector(first.x + stepSize, end.y), 1);
 						return true;
 					}
 					else
 						return false;
 				}
-				if(this.player.velocity.x < 0 && !checkResult())
-					setSnap();
-				else if(this.player.velocity.x > 0 && !checkReversedResult())
-					setSnap();
-				else if(!(checkResult() || checkReversedResult()))
-					setSnap();
+				
+				
+				if(this.player.velocity.x < 0 && !checkResultY())
+					setSnapY();
+				else if(this.player.velocity.x > 0 && !checkReversedResultY())
+					setSnapY();
+				else if(!(checkResultY() || checkReversedResultY()))
+					setSnapY();
 			}
 		}
-		
+
 		this.player.velocity.x = zerofyVelocity.x === true ? 0 : this.player.velocity.x;
 		this.player.velocity.y = zerofyVelocity.y === true ? 0 : this.player.velocity.y;
 		this.player.snapToGrid(snapChart);
@@ -1552,7 +1555,7 @@ Socket.prototype =
 		}
 		else
 		{
-			console.log('could not send');
+			//console.log('could not send');
 			return false;
 		}
 	},
